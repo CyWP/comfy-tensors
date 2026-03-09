@@ -49,9 +49,9 @@ class TorchSymbolic:
 
         # Normalize tensor input to list
         if isinstance(tensor, list):
-            tensors = tensor
+            tensors = [t["samples"] for t in tensor]
         else:
-            tensors = [tensor]
+            tensors = [tensor["samples"]]
 
         # Assign variable names
         names = generate_symbol_names(len(tensors))
@@ -66,4 +66,4 @@ class TorchSymbolic:
         # Evaluate expression
         result = parser.compute(expr, variables)
 
-        return (result,)
+        return ({"samples": result},)

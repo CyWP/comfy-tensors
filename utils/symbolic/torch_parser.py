@@ -1,7 +1,10 @@
 import torch
 import torch.nn.functional as F
 
-from .parser import Parser
+try:
+    from .parser import Parser
+except:
+    from parser import Parser
 
 
 def idx(x, *indices):
@@ -14,10 +17,12 @@ def idx(x, *indices):
         if isinstance(i, tuple):
             # interpret tuple as slice(start, stop, step)
             parsed.append(slice(*i))
+        elif i is None:
+            parsed.append(slice(i))
         else:
             # integer / tensor / boolean mask
             parsed.append(i)
-
+    print("Parsed: ", parsed)
     return x[tuple(parsed)]
 
 
@@ -81,3 +86,14 @@ class TorchParser(Parser):
 
     def __init__(self):
         super().__init__(functions=TorchParser._torch_functions)
+
+
+if __name__ == "__main__":
+    vars = {
+        "x": torch.randn((3, 3, 3)),
+        "y": torch.zeros((3, 3, 3)),
+    }
+    expr = "(x + y)**2/x-x + repeat(unsqueeze(idx(y, 0, :, :), 0), 3, 1, 1)"
+    parser = TorchParser()
+    print(parser.compute(expr, vars))
+    print("done, Should be very close to zero.")

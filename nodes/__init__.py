@@ -7,4 +7,5 @@ from .bridges import (
     Latent2Mask,
     Mask2Latent,
 )
+from .debug import TensorInspector
 from .symbolic import TorchSymbolic

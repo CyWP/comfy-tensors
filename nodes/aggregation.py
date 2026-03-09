@@ -13,7 +13,7 @@ class TensorCat:
 
     RETURN_TYPES = ("TENSOR",)
     FUNCTION = "run"
-    CATEGORY = "TensorOps"
+    CATEGORY = "Tensor Ops"
 
     def run(self, tensors, dim):
 
@@ -45,7 +45,7 @@ class TensorStack:
 
     RETURN_TYPES = ("TENSOR",)
     FUNCTION = "run"
-    CATEGORY = "TensorOps"
+    CATEGORY = "Tensor Ops"
 
     def run(self, tensors, dim):
 

@@ -10,4 +10,5 @@ NODE_CLASS_MAPPINGS = {
     "Mask2Image": Mask2Img,
     "Concatenate": TensorCat,
     "Stack": TensorStack,
+    "Inspect": TensorInspector,
 }
