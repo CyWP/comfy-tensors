@@ -1,29 +1,53 @@
+"""PyTorch-specific expression parser extending the base Parser.
+
+Provides tensor functions for use in TorchSymbolic expressions.
+"""
+
 import torch
 import torch.nn.functional as F
 
-from .parser import Parser
+try:
+    from .parser import Parser
+except Exception:
+    from parser import Parser
 
 
-def idx(x, *indices):
-    """
-    Parse tuples for indexing.
+def idx(x: torch.Tensor, *indices: int | tuple | None) -> torch.Tensor:
+    """Indexes a tensor with parsed indices.
+
+    Interprets tuples as slice(start, stop, step) and None as slice(None).
+
+    Args:
+        x: Tensor to index.
+        *indices: Indices which may be int, tuple (slice), or None.
+
+    Returns:
+        Indexed tensor.
     """
     parsed = []
 
     for i in indices:
         if isinstance(i, tuple):
-            # interpret tuple as slice(start, stop, step)
             parsed.append(slice(*i))
+        elif i is None:
+            parsed.append(slice(i))
         else:
-            # integer / tensor / boolean mask
             parsed.append(i)
 
     return x[tuple(parsed)]
 
 
 class TorchParser(Parser):
+    """PyTorch-specific expression parser.
 
-    _torch_functions = {
+    Extends Parser with a comprehensive set of PyTorch tensor operations
+    organized into categories: math, shape, combinators, conversion, indexing.
+
+    Attributes:
+        _torch_functions: Dict of available tensor functions.
+    """
+
+    _torch_functions: dict[str, callable] = {
         # Mathematical functions
         "abs": lambda x: x.abs(),
         "sin": torch.sin,
@@ -51,7 +75,7 @@ class TorchParser(Parser):
         "round": lambda x: x.round(),
         "clamp": lambda x, a, b: torch.clamp(x, min=a, max=b),
         "clip": lambda x, a, b: torch.clamp(x, min=a, max=b),
-        # Shape ops
+        # Shape operations
         "T": lambda x: x.T,
         "transpose": lambda x, dim0, dim1: x.transpose(dim0, dim1),
         "permute": lambda x, *dims: x.permute(*dims),
@@ -64,12 +88,12 @@ class TorchParser(Parser):
         "squeeze": lambda x, dim=None: x.squeeze() if dim is None else x.squeeze(dim),
         "repeat": lambda x, *dims: x.repeat(*dims),
         "expand": lambda x, *dims: x.expand(*dims),
-        "chunk": lambda x, chunks, dims=None: x.chunk(x, chunks, dims),
-        "split": lambda x, i, dim=0: x.tensor_split(x, i, dim),
-        # combinations
+        "chunk": lambda x, chunks, dim=0: x.chunk(chunks, dim),
+        "split": lambda x, indices_or_sections, dim=0: x.tensor_split(indices_or_sections, dim),
+        # Combinators
         "cat": lambda *args: torch.cat(args[:-1], dim=args[-1]),
         "stack": lambda *args: torch.stack(args[:-1], dim=args[-1]),
-        # conversions
+        # Conversions
         "float": lambda x: x.float(),
         "half": lambda x: x.half(),
         "long": lambda x: x.long(),
@@ -80,4 +104,5 @@ class TorchParser(Parser):
     }
 
     def __init__(self):
+        """Initializes TorchParser with PyTorch functions."""
         super().__init__(functions=TorchParser._torch_functions)

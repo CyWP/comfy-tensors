@@ -1,0 +1,23 @@
+[project]
+name = "tensors"
+description = ""
+version = "1.0.0"
+license = {file = "LICENSE"} 
+classifiers = [
+    "Operating System :: OS Independent",
+]
+
+dependencies = ["torch"]
+
+[project.urls]
+Repository = "https://github.com/CyWP/comfy-tensors"
+#  Used by Comfy Registry https://registry.comfy.org
+Documentation = "https://github.com/CyWP/comfy-tensors/wiki"
+"Bug Tracker" = "https://github.com/CyWP/comfy-tensors/issues"
+
+[tool.comfy]
+PublisherId = "cyvv"
+DisplayName = "Comfy Tensors"
+Icon = ""
+includes = [] 
+
